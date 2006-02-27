@@ -53,7 +53,7 @@ class Test::Unit::TestCase
 
 private
   def http
-    if const_defined?(:ApplicationConfig) ::ApplicationConfig.respond_to?(:proxy_config)
+    if ApplicationConfig && ApplicationConfig.respond_to?(:proxy_config)
       Net::HTTP::Proxy(ApplicationConfig.proxy_config['host'], ApplicationConfig.proxy_config['port'])
     else
       Net::HTTP
