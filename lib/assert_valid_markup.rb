@@ -18,27 +18,11 @@ class Test::Unit::TestCase
   #   end
   #
   def assert_valid_markup(fragment=@response.body)
-    fragment_md5 = MD5.md5(fragment).to_s
-    file_md5 = nil
+    
+    base_filename = cache_resource(fragment,'html')
 
-    output_dir = "#{RAILS_ROOT}/temp"
-    base_filename = File.join(output_dir, self.class.name.gsub(/\:\:/,'/').gsub(/Controllers\//,'') + '.' + method_name)
-
-    parent_dir = File.dirname(base_filename) 
-    Dir.mkdir(parent_dir) unless File.exists?(parent_dir)
-
-    content_filename = base_filename + '.html'
-
-    File.open(content_filename, 'r') do |f| 
-      file_md5 = MD5.md5(f.read(f.stat.size)).to_s
-    end if File.exists?(content_filename)
-
+    return unless base_filename
     results_filename =  base_filename + '-results.yml'
-
-    if file_md5 != fragment_md5
-      File.open(content_filename, 'w+') do |f| f.write(fragment); end
-      File.delete(results_filename) if File.exists?(results_filename)
-    end
 
     begin
       response = File.open(results_filename) do |f| Marshal.load(f) end
@@ -52,6 +36,31 @@ class Test::Unit::TestCase
   end
 
 private
+
+  def cache_resource(resource,extension)
+    resource_md5 = MD5.md5(resource).to_s
+    file_md5 = nil
+
+    output_dir = "#{RAILS_ROOT}/temp"
+    base_filename = File.join(output_dir, self.class.name.gsub(/\:\:/,'/').gsub(/Controllers\//,'') + '.' + method_name + '.')
+    filename = base_filename + extension
+    
+    parent_dir = File.dirname(filename) 
+    Dir.mkdir(parent_dir) unless File.exists?(parent_dir)
+
+    File.open(filename, 'r') do |f| 
+      file_md5 = MD5.md5(f.read(f.stat.size)).to_s
+    end if File.exists?(filename)
+
+    if file_md5 != resource_md5
+      Dir["#{base_filename}[^.]*"] .each {|f| File.delete(f)}
+      File.open(filename, 'w+') do |f| f.write(resource); end
+      base_filename
+    else
+      false
+    end  
+  end
+
   def http
     if ApplicationConfig && ApplicationConfig.respond_to?(:proxy_config)
       Net::HTTP::Proxy(ApplicationConfig.proxy_config['host'], ApplicationConfig.proxy_config['port'])
