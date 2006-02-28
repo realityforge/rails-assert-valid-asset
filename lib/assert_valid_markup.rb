@@ -18,7 +18,6 @@ class Test::Unit::TestCase
   #   end
   #
   def assert_valid_markup(fragment=@response.body)
-    
     base_filename = cache_resource(fragment,'html')
 
     return unless base_filename
@@ -35,7 +34,48 @@ class Test::Unit::TestCase
     assert(markup_is_valid, message)
   end
 
+  # Assert that css is valid according the W3C validator web service.
+  def assert_valid_css(css,filename='file.css',mime_type='text/css')
+    base_filename = cache_resource(css,'css')
+    results_filename =  base_filename + 'results.yml'
+    begin
+      response = File.open(results_filename) do |f| Marshal.load(f) end
+    rescue
+      params = [ file_to_multipart_param('file',filename,mime_type,css),
+		      text_to_multipart_param('warning','1'),
+                      text_to_multipart_param('profile','css2'),
+                      text_to_multipart_param('usermedium','all') ]
+
+      boundary = '-----------------------------24464570528145'
+      query = params.collect { |p| '--' + boundary + "\r\n" + p }.join('') + boundary + "--\r\n"
+
+      response = http.start('jigsaw.w3.org').post2("/css-validator/validator",query,"Content-type" => "multipart/form-data; boundary=" + boundary)
+      File.open(results_filename, 'w+') do |f| Marshal.dump(response, f) end
+    end
+    messages = []
+    REXML::XPath.each( REXML::Document.new(response.body).root, "//div[@id='errors']/div/ul/li") do |element|
+      messages << element.to_s.gsub(/<[^>]+>/,' ').gsub(/\n/,' ').gsub(/\s+/, ' ')
+    end
+    if messages.length > 0
+      message = messages.join("\n")
+      flunk("CSS Validation failed:\n#{message}")
+    end
+  end
+
 private
+  def text_to_multipart_param(key,value)
+    return "Content-Disposition: form-data; name=\"#{CGI::escape(key)}\"\r\n\r\n#{value}\r\n"
+  end
+
+  def file_to_multipart_param(key,filename,mime_type,content)
+    return "Content-Disposition: form-data; name=\"#{CGI::escape(key)}\"; filename=\"#{filename}\"\r\n" +
+              "Content-Transfer-Encoding: binary\r\nContent-Type: #{mime_type}\r\n\r\n#{content}\r\n"
+  end
+
+  def file_to_multipart_param(key,filename,mime_type,content)
+    return "Content-Disposition: form-data; name=\"#{CGI::escape(key)}\"; filename=\"#{filename}\"\r\n" +
+              "Content-Type: #{mime_type}\r\n\r\n#{content}\r\n"
+  end
 
   def cache_resource(resource,extension)
     resource_md5 = MD5.md5(resource).to_s
@@ -55,10 +95,8 @@ private
     if file_md5 != resource_md5
       Dir["#{base_filename}[^.]*"] .each {|f| File.delete(f)}
       File.open(filename, 'w+') do |f| f.write(resource); end
-      base_filename
-    else
-      false
     end  
+    base_filename
   end
 
   def http
