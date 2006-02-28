@@ -100,7 +100,7 @@ private
   end
 
   def http
-    if ApplicationConfig && ApplicationConfig.respond_to?(:proxy_config)
+    if Module.constants.include?("ApplicationConfig") && ApplicationConfig.respond_to?(:proxy_config)
       Net::HTTP::Proxy(ApplicationConfig.proxy_config['host'], ApplicationConfig.proxy_config['port'])
     else
       Net::HTTP
