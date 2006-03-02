@@ -35,14 +35,14 @@ class Test::Unit::TestCase
   end
 
   # Assert that css is valid according the W3C validator web service.
-  def assert_valid_css(css,filename='file.css',mime_type='text/css')
+  def assert_valid_css(css)
     base_filename = cache_resource(css,'css')
     results_filename =  base_filename + 'results.yml'
     begin
       response = File.open(results_filename) do |f| Marshal.load(f) end
     rescue
       params = [ 
-        file_to_multipart('file',filename,mime_type,css),
+        file_to_multipart('file','file.css','text/css',css),
         text_to_multipart('warning','1'),
         text_to_multipart('profile','css2'),
         text_to_multipart('usermedium','all') ]
