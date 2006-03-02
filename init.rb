@@ -1,1 +1,1 @@
-require 'assert_valid_markup' if ENV["RAILS_ENV"] == 'test'
+require 'assert_valid_asset' if ENV['RAILS_ENV'] == 'test'
