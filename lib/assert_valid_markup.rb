@@ -41,11 +41,12 @@ class Test::Unit::TestCase
     begin
       response = File.open(results_filename) do |f| Marshal.load(f) end
     rescue
-      params = [ file_to_multipart_param('file',filename,mime_type,css),
-		      text_to_multipart_param('warning','1'),
-                      text_to_multipart_param('profile','css2'),
-                      text_to_multipart_param('usermedium','all') ]
-
+      params = [ 
+        file_to_multipart('file',filename,mime_type,css),
+        text_to_multipart('warning','1'),
+        text_to_multipart('profile','css2'),
+        text_to_multipart('usermedium','all') ]
+      
       boundary = '-----------------------------24464570528145'
       query = params.collect { |p| '--' + boundary + "\r\n" + p }.join('') + boundary + "--\r\n"
 
@@ -63,18 +64,13 @@ class Test::Unit::TestCase
   end
 
 private
-  def text_to_multipart_param(key,value)
+  def text_to_multipart(key,value)
     return "Content-Disposition: form-data; name=\"#{CGI::escape(key)}\"\r\n\r\n#{value}\r\n"
   end
 
-  def file_to_multipart_param(key,filename,mime_type,content)
+  def file_to_multipart(key,filename,mime_type,content)
     return "Content-Disposition: form-data; name=\"#{CGI::escape(key)}\"; filename=\"#{filename}\"\r\n" +
               "Content-Transfer-Encoding: binary\r\nContent-Type: #{mime_type}\r\n\r\n#{content}\r\n"
-  end
-
-  def file_to_multipart_param(key,filename,mime_type,content)
-    return "Content-Disposition: form-data; name=\"#{CGI::escape(key)}\"; filename=\"#{filename}\"\r\n" +
-              "Content-Type: #{mime_type}\r\n\r\n#{content}\r\n"
   end
 
   def cache_resource(resource,extension)
