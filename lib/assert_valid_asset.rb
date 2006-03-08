@@ -34,6 +34,25 @@ class Test::Unit::TestCase
     assert(markup_is_valid, message)
   end
 
+  # Class-level method to quickly create validation tests for a bunch of actions at once.
+  # For example, if you have a FooController with three actions, just add one line to foo_controller_test.rb:
+  #
+  #   assert_valid_markup :bar, :baz, :qux
+  #
+  # If you pass :but_first => :something, #something will be called at the beginning of each test case
+  def self.assert_valid_markup(*actions)
+    options = actions.find { |i| i.kind_of? Hash }
+    actions.delete_if { |i| i.kind_of? Hash }
+    actions.each do |action|
+      toeval = "def test_#{action}_valid_markup\n"
+      toeval << "#{options[:but_first].id2name}\n" if options and options[:but_first]
+      toeval << "get :#{action}\n"
+      toeval << "assert_valid_markup\n"
+      toeval << "end\n"
+      class_eval toeval
+    end
+  end
+
   # Assert that css is valid according the W3C validator web service.
   def assert_valid_css(css)
     base_filename = cache_resource(css,'css')
@@ -60,6 +79,18 @@ class Test::Unit::TestCase
     if messages.length > 0
       message = messages.join("\n")
       flunk("CSS Validation failed:\n#{message}")
+    end
+  end
+
+  # Class-level method to quickly create validation tests for a bunch of css files relative to 
+  # $RAILS_ROOT/public/stylesheets and ending in '.css'.
+  def self.assert_valid_css(*files)
+    files.each do |file|
+      filename = "#{RAILS_ROOT}/public/stylesheets/#{file}.css"
+      toeval = "def test_#{file}_valid_css\n"
+      toeval << "  assert_valid_css(File.open('#{filename}','rb').read)\n"
+      toeval << "end\n"
+      class_eval toeval
     end
   end
 
