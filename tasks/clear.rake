@@ -4,10 +4,10 @@ task :clear_backup => :environment do
 end
 
 desc "Cleanup temporary files"
-task :clear_temp => :environment do
-  Dir.glob("#{RAILS_ROOT}/temp/*") {|f| FileUtils.rm_r(f, :force => true) unless f == '.svn'}
+task :clear_tmp => :environment do
+  Dir.glob("#{RAILS_ROOT}/tmp/*") {|f| FileUtils.rm_r(f, :force => true) unless f == '.svn'}
 end
 
 desc "Cleanup temporary and intermediate files"
-task :clear => [:clear_backup, :clear_temp, :clear_logs] do
+task :clear => [:clear_backup, :clear_tmp, :clear_logs] do
 end

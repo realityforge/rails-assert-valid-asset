@@ -7,8 +7,9 @@ class Test::Unit::TestCase
   # Assert that markup (html/xhtml) is valid according the W3C validator web service.
   # By default, it validates the contents of @response.body, which is set after calling
   # one of the get/post/etc helper methods. You can also pass it a string to be validated.
-  # Validation errors, if any, will be included in the output. The response from the validator
-  # service will be cached in the system temp directory to minimize duplicate calls.
+  # Validation errors, if any, will be included in the output. The input fragment and 
+  # response from the validator service will be cached in the $RAILS_ROOT/tmp directory to 
+  # minimize network calls.
   #
   # For example, if you have a FooController with an action Bar, put this in foo_controller_test.rb:
   #
@@ -54,6 +55,17 @@ class Test::Unit::TestCase
   end
 
   # Assert that css is valid according the W3C validator web service.
+  # You pass the css as a string to the method. Validation errors, if any, 
+  # will be included in the output. The input fragment and response from 
+  # the validator service will be cached in the $RAILS_ROOT/tmp directory to 
+  # minimize network calls.
+  #
+  # For example, if you have a css file standard.css you can add the following test;
+  #
+  #   def test_standard_css
+  #     assert_valid_css(File.open("#{RAILS_ROOT}/public/stylesheets/standard.css",'rb').read)
+  #   end
+  #
   def assert_valid_css(css)
     base_filename = cache_resource(css,'css')
     results_filename =  base_filename + 'results.yml'
@@ -84,6 +96,13 @@ class Test::Unit::TestCase
 
   # Class-level method to quickly create validation tests for a bunch of css files relative to 
   # $RAILS_ROOT/public/stylesheets and ending in '.css'.
+  #
+  # The following example validates layout.css and standard.css in the standard directory ($RAILS_ROOT/public/stylesheets);
+  #
+  #   class CssTest < Test::Unit::TestCase
+  #     assert_valid_css 'layout', 'standard'
+  #   end
+  #
   def self.assert_valid_css(*files)
     files.each do |file|
       filename = "#{RAILS_ROOT}/public/stylesheets/#{file}.css"
@@ -108,7 +127,7 @@ private
     resource_md5 = MD5.md5(resource).to_s
     file_md5 = nil
 
-    output_dir = "#{RAILS_ROOT}/temp"
+    output_dir = "#{RAILS_ROOT}/tmp"
     base_filename = File.join(output_dir, self.class.name.gsub(/\:\:/,'/').gsub(/Controllers\//,'') + '.' + method_name + '.')
     filename = base_filename + extension
     
