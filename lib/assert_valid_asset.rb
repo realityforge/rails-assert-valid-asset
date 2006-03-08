@@ -1,6 +1,7 @@
 require 'test/unit'
 require 'net/http'
 require 'digest/md5'
+require 'ftools'
 
 class Test::Unit::TestCase
 
@@ -19,7 +20,7 @@ class Test::Unit::TestCase
   #   end
   #
   def assert_valid_markup(fragment=@response.body)
-    base_filename = cache_resource(fragment,'html')
+    base_filename = cache_resource('markup',fragment,'html')
 
     return unless base_filename
     results_filename =  base_filename + '-results.yml'
@@ -67,7 +68,7 @@ class Test::Unit::TestCase
   #   end
   #
   def assert_valid_css(css)
-    base_filename = cache_resource(css,'css')
+    base_filename = cache_resource('css',css,'css')
     results_filename =  base_filename + 'results.yml'
     begin
       response = File.open(results_filename) do |f| Marshal.load(f) end
@@ -123,16 +124,16 @@ private
               "Content-Transfer-Encoding: binary\r\nContent-Type: #{mime_type}\r\n\r\n#{content}\r\n"
   end
 
-  def cache_resource(resource,extension)
+  def cache_resource(base,resource,extension)
     resource_md5 = MD5.md5(resource).to_s
     file_md5 = nil
 
-    output_dir = "#{RAILS_ROOT}/tmp"
+    output_dir = "#{RAILS_ROOT}/tmp/#{base}"
     base_filename = File.join(output_dir, self.class.name.gsub(/\:\:/,'/').gsub(/Controllers\//,'') + '.' + method_name + '.')
     filename = base_filename + extension
     
     parent_dir = File.dirname(filename) 
-    Dir.mkdir(parent_dir) unless File.exists?(parent_dir)
+    File.makedirs(parent_dir) unless File.exists?(parent_dir)
 
     File.open(filename, 'r') do |f| 
       file_md5 = MD5.md5(f.read(f.stat.size)).to_s
