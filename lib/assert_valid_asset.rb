@@ -20,6 +20,7 @@ class Test::Unit::TestCase
   #   end
   #
   def assert_valid_markup(fragment=@response.body)
+    return if validity_checks_disabled?
     base_filename = cache_resource('markup',fragment,'html')
 
     return unless base_filename
@@ -68,6 +69,7 @@ class Test::Unit::TestCase
   #   end
   #
   def assert_valid_css(css)
+    return if validity_checks_disabled?
     base_filename = cache_resource('css',css,'css')
     results_filename =  base_filename + 'results.yml'
     begin
@@ -115,6 +117,10 @@ class Test::Unit::TestCase
   end
 
 private
+  def validity_checks_disabled?
+    ENV["NONET"] == 'true'
+  end
+
   def text_to_multipart(key,value)
     return "Content-Disposition: form-data; name=\"#{CGI::escape(key)}\"\r\n\r\n#{value}\r\n"
   end

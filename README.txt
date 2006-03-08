@@ -10,7 +10,10 @@ has changed.
 The code started life as a few modifications to Scott Raymond's assert_valid_markup
 (http://redgreenblu.com/svn/projects/assert_valid_markup/) and evolved to support 
 controllers in modules without messing up the cache. Then the ability to validate 
-CSS files was added. Most of the credit still goes to Scott for his initial work!
+CSS files was added. I also added the ability to skip checks if the "NONET" environment
+variable is set to "true". 
+
+Most of the credit goes to Scott for his initial idea!
 
 == HowTo Validate (X)HTML
 
