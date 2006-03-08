@@ -101,10 +101,10 @@ class Test::Unit::TestCase
   # The following example validates layout.css and standard.css in the standard directory ($RAILS_ROOT/public/stylesheets);
   #
   #   class CssTest < Test::Unit::TestCase
-  #     assert_valid_css 'layout', 'standard'
+  #     assert_valid_css_files 'layout', 'standard'
   #   end
   #
-  def self.assert_valid_css(*files)
+  def self.assert_valid_css_files(*files)
     files.each do |file|
       filename = "#{RAILS_ROOT}/public/stylesheets/#{file}.css"
       toeval = "def test_#{file.gsub(/-/,'_')}_valid_css\n"
