@@ -107,7 +107,7 @@ class Test::Unit::TestCase
   def self.assert_valid_css(*files)
     files.each do |file|
       filename = "#{RAILS_ROOT}/public/stylesheets/#{file}.css"
-      toeval = "def test_#{file}_valid_css\n"
+      toeval = "def test_#{file.gsub(/-/,'_')}_valid_css\n"
       toeval << "  assert_valid_css(File.open('#{filename}','rb').read)\n"
       toeval << "end\n"
       class_eval toeval
