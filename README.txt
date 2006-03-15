@@ -3,14 +3,14 @@
 assert_valid_asset is a plugin to validate your (X)HTML and CSS using the W3C Validator 
 web service (http://validator.w3.org/) and the W3C CSS Validation Service 
 (http://jigsaw.w3.org/css-validator) as part of your functional or unit tests. 
-The css and html fragments are cached in $RAILS_ROOT/temp as are the results from the 
+The css and html fragments are cached in $RAILS_ROOT/tmp as are the results from the 
 web service. This means that your tests will not be slowed down unless the output 
 has changed.
 
 The code started life as a few modifications to Scott Raymond's assert_valid_markup
-(http://redgreenblu.com/svn/projects/assert_valid_markup/) and evolved to support 
-controllers in modules without messing up the cache. Then the ability to validate 
-CSS files was added. I also added the ability to skip checks if the "NONET" environment
+(http://redgreenblu.com/svn/projects/assert_valid_markup/) and evolved to cache fragments
+and results in $RAILS_ROOT/tmp rather than the system temp directory. Then the ability to 
+validate CSS files was added. I also added the ability to skip checks if the "NONET" environment
 variable is set to "true". 
 
 Most of the credit goes to Scott for his initial idea!
