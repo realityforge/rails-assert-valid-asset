@@ -59,7 +59,7 @@ Most of the credit goes to Scott for his initial idea!
   # and $RAILS_ROOT/public/stylesheets/theme.css
 
     class FooControllerTest < Test::Unit::TestCase
-      assert_valid_css 'layout', 'standard', 'theme'
+      assert_valid_css_files 'layout', 'standard', 'theme'
     end
 
 == Details
