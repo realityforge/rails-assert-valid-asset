@@ -11,5 +11,5 @@ end
 Rake::Task['tmp:clear'].enhance(['tmp:assets:clear'])
 
 desc "Cleanup temporary, log and backup files"
-task :clear => ['tmp:clear', :clear_backup, 'logs:clear'] do
+task :clear => ['tmp:clear', 'backups:clear', 'log:clear'] do
 end
