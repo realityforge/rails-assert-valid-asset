@@ -1,13 +1,15 @@
 desc "Cleanup Backup files"
-task :clear_backup => :environment do
+task 'backups:clear' => :environment do
   Dir["#{RAILS_ROOT}/**/*.*~"].each {|file| File.delete(file)}
 end
 
-desc "Cleanup temporary files"
-task :clear_tmp => :environment do
-  Dir.glob("#{RAILS_ROOT}/tmp/*") {|f| FileUtils.rm_r(f, :force => true) unless f == '.svn'}
+desc "Clears all files in tmp/test/assets"
+task 'tmp:assets:clear' => :environment do
+  FileUtils.rm_rf(Dir['tmp/test/assets/[^.]*'])
 end
 
-desc "Cleanup temporary and intermediate files"
-task :clear => [:clear_backup, :clear_tmp, :clear_logs] do
+Rake::Task['tmp:clear'].enhance(['tmp:assets:clear'])
+
+desc "Cleanup temporary, log and backup files"
+task :clear => ['tmp:clear', :clear_backup, 'logs:clear'] do
 end
