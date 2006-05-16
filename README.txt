@@ -13,6 +13,10 @@ and results in $RAILS_ROOT/tmp/test/assets rather than the system temp directory
 ability to validate CSS files was added. I also added the ability to skip checks if the 
 "NONET" environment variable is set to "true". 
 
+A more recent version made it possible to display the content with the line numbers by
+adding a line such as "self.display_invalid_content = true" into test_helper.rb in the
+Test::Unit::TestCase class.
+
 Most of the credit goes to Scott for his initial idea!
 
 == HowTo Validate (X)HTML
@@ -71,4 +75,4 @@ Latest Version: http://www.realityforge.org/svn/public/code/assert-valid-asset/t
 
 Scott Raymond <sco@scottraymond.net> for the initial version. 
 Peter Donald <peter at realityforge dot org> to add validation of CSS files and fix caching.
-
+Simon Stapleton for inspiration to add who added support display_invalid_content.
