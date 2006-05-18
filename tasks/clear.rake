@@ -5,7 +5,9 @@ end
 
 desc "Clears all files in tmp/test/assets"
 task 'tmp:assets:clear' => :environment do
-  FileUtils.rm_rf(Dir['tmp/test/assets/[^.]*'])
+  FileUtils.rm_rf(Dir['tmp/test/css/[^.]*'])
+  FileUtils.rm_rf(Dir['tmp/test/markup/[^.]*'])
+  FileUtils.rm_rf(Dir['tmp/test/test/[^.]*'])
 end
 
 Rake::Task['tmp:clear'].enhance(['tmp:assets:clear'])
