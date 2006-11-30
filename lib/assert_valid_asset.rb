@@ -1,6 +1,6 @@
 require 'test/unit'
 require 'net/http'
-require 'digest/md5'
+require 'md5'
 require 'ftools'
 
 class Test::Unit::TestCase
