@@ -4,6 +4,11 @@ require 'md5'
 require 'ftools'
 
 class Test::Unit::TestCase
+  MARKUP_VALIDATOR_HOST = ENV['MARKUP_VALIDATOR_HOST'] || 'validator.w3.org'
+  MARKUP_VALIDATOR_PATH = ENV['MARKUP_VALIDATOR_PATH'] || '/check'
+  CSS_VALIDATOR_HOST = ENV['CSS_VALIDATOR_HOST'] || 'jigsaw.w3.org'
+  CSS_VALIDATOR_PATH = ENV['CSS_VALIDATOR_PATH'] || '/css-validator/validator'
+
   @@display_invalid_content = false
   cattr_accessor :display_invalid_content
 
@@ -31,7 +36,7 @@ class Test::Unit::TestCase
     begin
       response = File.open(results_filename) do |f| Marshal.load(f) end
     rescue
-      response = http.start('validator.w3.org').post2('/check', "fragment=#{CGI.escape(fragment)}&output=xml")
+      response = http.start(MARKUP_VALIDATOR_HOST).post2(MARKUP_VALIDATOR_PATH, "fragment=#{CGI.escape(fragment)}&output=xml")
       File.open(results_filename, 'w+') do |f| Marshal.dump(response, f) end
     end
     markup_is_valid = response['x-w3c-validator-status'] == 'Valid'
@@ -92,7 +97,7 @@ class Test::Unit::TestCase
       boundary = '-----------------------------24464570528145'
       query = params.collect { |p| '--' + boundary + "\r\n" + p }.join('') + boundary + "--\r\n"
 
-      response = http.start('jigsaw.w3.org').post2("/css-validator/validator",query,"Content-type" => "multipart/form-data; boundary=" + boundary)
+      response = http.start(CSS_VALIDATOR_HOST).post2(CSS_VALIDATOR_PATH,query,"Content-type" => "multipart/form-data; boundary=" + boundary)
       File.open(results_filename, 'w+') do |f| Marshal.dump(response, f) end
     end
     messages = []
