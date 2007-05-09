@@ -17,7 +17,35 @@ A more recent version made it possible to display the content with the line numb
 adding a line such as "self.display_invalid_content = true" into test_helper.rb in the
 Test::Unit::TestCase class.
 
-Most of the credit goes to Scott for his initial idea!
+The ability to automatically validate content generated as a result of a action can be enabled
+by adding the line "self.auto_validate = true" into test_helper.rb in the Test::Unit::TestCase
+class. This will generate content according to the mime type of content. (x)html will be passed
+to assert_valid_markup and css will be passed to assert_valid_css. You can also exclude
+specific tests by putting them into an an auto_validate_excludes or instead can choose to only
+include tests in list auto_validate_includes.
+
+i.e. The following will automatically validate content generated in the test_foo and test_bar tests.
+
+    class FooControllerTest < Test::Unit::TestCase
+
+      self.auto_validate_excludes = [:test_baz]
+
+      def test_foo; ... ; end
+      def test_bar; ... ; end
+      def test_baz; ... ; end
+    end
+
+i.e. The following will automatically validate content generated in the test_baz test.
+
+    class FooControllerTest < Test::Unit::TestCase
+
+      self.auto_validate_includes = [:test_baz]
+
+      def test_foo; ... ; end
+      def test_bar; ... ; end
+      def test_baz; ... ; end
+    end
+
 
 == HowTo Validate (X)HTML
 
