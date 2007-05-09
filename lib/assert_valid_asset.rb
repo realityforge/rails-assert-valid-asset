@@ -18,7 +18,7 @@ class Test::Unit::TestCase
 
   def process_with_auto_validate(action, parameters = nil, session = nil, flash = nil)
     process_without_auto_validate(action,parameters,session,flash)
-    if @@auto_validate
+    if @@auto_validate and (not @response.redirect?) and not @response.body.empty?
       ct = @response.headers['Content-Type']
       if ct.include?('text/html') or ct.include?('text/xhtml')
         assert_valid_markup
