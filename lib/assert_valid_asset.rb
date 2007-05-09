@@ -1,3 +1,4 @@
+require 'action_controller/test_process'
 require 'test/unit'
 require 'net/http'
 require 'md5'
@@ -11,6 +12,23 @@ class Test::Unit::TestCase
 
   @@display_invalid_content = false
   cattr_accessor :display_invalid_content
+
+  @@auto_validate = false
+  cattr_accessor :auto_validate
+
+  def process_with_auto_validate(action, parameters = nil, session = nil, flash = nil)
+    process_without_auto_validate(action,parameters,session,flash)
+    if @@auto_validate
+      ct = @response.headers['Content-Type']
+      if ct.include?('text/html') or ct.include?('text/xhtml')
+        assert_valid_markup
+      elsif ct.include?('text/css')
+        assert_valid_css(@response.body)
+      end
+    end
+  end
+
+  alias_method_chain :process, :auto_validate
 
   # Assert that markup (html/xhtml) is valid according the W3C validator web service.
   # By default, it validates the contents of @response.body, which is set after calling
