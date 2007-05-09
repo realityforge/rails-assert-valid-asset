@@ -26,6 +26,10 @@ include tests in list auto_validate_includes.
 
 i.e. The following will automatically validate content generated in the test_foo and test_bar tests.
 
+    class Test::Unit::TestCase
+      self.auto_validate = true
+    end
+
     class FooControllerTest < Test::Unit::TestCase
 
       self.auto_validate_excludes = [:test_baz]
@@ -36,6 +40,10 @@ i.e. The following will automatically validate content generated in the test_foo
     end
 
 i.e. The following will automatically validate content generated in the test_baz test.
+
+    class Test::Unit::TestCase
+      self.auto_validate = true
+    end
 
     class FooControllerTest < Test::Unit::TestCase
 
