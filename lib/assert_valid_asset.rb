@@ -16,10 +16,15 @@ class Test::Unit::TestCase
   @@auto_validate = false
   cattr_accessor :auto_validate
 
+  class_inheritable_accessor :auto_validate_excludes
+  class_inheritable_accessor :auto_validate_includes
+
   def process_with_auto_validate(action, parameters = nil, session = nil, flash = nil)
     process_without_auto_validate(action,parameters,session,flash)
     if @@auto_validate
-      # Rails generates bad html for redirects 
+      return if (auto_validate_excludes and auto_validate_excludes.include?(method_name.to_sym))
+      return if (auto_validate_includes and not auto_validate_includes.include?(method_name.to_sym))
+      # Rails generates bad html for redirects
       return if @response.redirect?
       ct = @response.headers['Content-Type']
       if ct.include?('text/html') or ct.include?('text/xhtml')
