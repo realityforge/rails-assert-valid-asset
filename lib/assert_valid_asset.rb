@@ -23,7 +23,7 @@ class Test::Unit::TestCase
       if ct.include?('text/html') or ct.include?('text/xhtml')
         assert_valid_markup
       elsif ct.include?('text/css')
-        assert_valid_css(@response.body)
+        assert_valid_css
       end
     end
   end
@@ -99,7 +99,7 @@ class Test::Unit::TestCase
   #     assert_valid_css(File.open("#{RAILS_ROOT}/public/stylesheets/standard.css",'rb').read)
   #   end
   #
-  def assert_valid_css(css)
+  def assert_valid_css(css=@response.body)
     return if validity_checks_disabled?
     base_filename = cache_resource('css',css,'css')
     results_filename =  base_filename + 'results.yml'
