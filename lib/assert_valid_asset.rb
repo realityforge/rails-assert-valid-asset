@@ -10,18 +10,17 @@ class Test::Unit::TestCase
   CSS_VALIDATOR_HOST = ENV['CSS_VALIDATOR_HOST'] || 'jigsaw.w3.org'
   CSS_VALIDATOR_PATH = ENV['CSS_VALIDATOR_PATH'] || '/css-validator/validator'
 
-  @@display_invalid_content = false
-  cattr_accessor :display_invalid_content
-
-  @@auto_validate = false
-  cattr_accessor :auto_validate
-
+  class_inheritable_accessor :display_invalid_content
+  class_inheritable_accessor :auto_validate
   class_inheritable_accessor :auto_validate_excludes
   class_inheritable_accessor :auto_validate_includes
 
+  self.display_invalid_content = false
+  self.auto_validate = false
+
   def process_with_auto_validate(action, parameters = nil, session = nil, flash = nil)
     process_without_auto_validate(action,parameters,session,flash)
-    if @@auto_validate
+    if auto_validate
       return if (auto_validate_excludes and auto_validate_excludes.include?(method_name.to_sym))
       return if (auto_validate_includes and not auto_validate_includes.include?(method_name.to_sym))
       # Rails generates bad html for redirects
@@ -67,7 +66,7 @@ class Test::Unit::TestCase
     markup_is_valid = response['x-w3c-validator-status'] == 'Valid'
     message = ''
     unless markup_is_valid
-      fragment.split($/).each_with_index{|line, index| message << "#{'%04i' % (index+1)} : #{line}#{$/}"} if @@display_invalid_content
+      fragment.split($/).each_with_index{|line, index| message << "#{'%04i' % (index+1)} : #{line}#{$/}"} if display_invalid_content
       message << XmlSimple.xml_in(response.body)['messages'][0]['msg'].collect{ |m| "Invalid markup: line #{m['line']}: #{CGI.unescapeHTML(m['content'])}" }.join("\n")
     end
 
