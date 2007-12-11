@@ -19,7 +19,7 @@ class Test::Unit::TestCase
   self.auto_validate = false
 
   def process_with_auto_validate(action, parameters = nil, session = nil, flash = nil)
-    process_without_auto_validate(action,parameters,session,flash)
+    response = process_without_auto_validate(action,parameters,session,flash)
     if auto_validate
       return if (auto_validate_excludes and auto_validate_excludes.include?(method_name.to_sym))
       return if (auto_validate_includes and not auto_validate_includes.include?(method_name.to_sym))
@@ -32,6 +32,7 @@ class Test::Unit::TestCase
         assert_valid_css
       end
     end
+    response
   end
 
   alias_method_chain :process, :auto_validate
